@@ -1,0 +1,10 @@
+.vercel
+.env*.local
+github.rtf
+github.rtf
+*.rtf
+*.rtfd/
+*.jpeg
+*.png
+.DS_Store
+.env.local
