@@ -1,11 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-const url  = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient(url, anon)
-
 export function getServerClient() {
-  const key = process.env.SUPABASE_SERVICE_KEY || anon
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) throw new Error('Supabase env vars missing')
+  return createClient(url, key)
+}
+
+export function getBrowserClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   return createClient(url, key)
 }
