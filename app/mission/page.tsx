@@ -73,6 +73,7 @@ export default function MissionControl() {
   const [alerts, setAlerts]       = useState<Alert[]>([])
   const [events, setEvents]       = useState<Event[]>([])
   const [sites,  setSites]        = useState<Site[]>([])
+  const [signals, setSignals]      = useState<any[]>([])
   const [chat,   setChat]         = useState<ChatMsg[]>([{
     role: 'astra',
     content: 'ASTRA CORE online. STRATUM indexed. Monitoring USGS, EPA, NOAA, ASF, TCEQ feeds. Query anything.',
@@ -80,7 +81,7 @@ export default function MissionControl() {
   }])
   const [input,    setInput]      = useState('')
   const [thinking, setThinking]   = useState(false)
-  const [tab,      setTab]        = useState<'alerts'|'events'|'sites'>('alerts')
+  const [tab,      setTab]        = useState<'alerts'|'events'|'sites'|'signals'>('alerts')
   const [clock,    setClock]      = useState('')
   const [history,  setHistory]    = useState<{role:string;content:string}[]>([])
   const chatRef  = useRef<HTMLDivElement>(null)
@@ -112,6 +113,14 @@ export default function MissionControl() {
     } catch {}
   }, [])
 
+  const fetchSignals = useCallback(async () => {
+    try {
+      const r = await fetch(`/api/astra/signals`)
+      const j = await r.json()
+      if (j.data) setSignals(j.data)
+    } catch {}
+  }, [])
+
   const fetchSites = useCallback(async () => {
     try {
       const r = await fetch('/api/astra/events?type=sites')
@@ -124,9 +133,10 @@ export default function MissionControl() {
     fetchAlerts()
     fetchEvents()
     fetchSites()
+    fetchSignals()
     const t = setInterval(() => { fetchAlerts(); fetchEvents() }, 30000)
     return () => clearInterval(t)
-  }, [fetchAlerts, fetchEvents, fetchSites])
+  }, [fetchAlerts, fetchEvents, fetchSites, fetchSignals])
 
   // Pulse canvas
   useEffect(() => {
@@ -397,7 +407,7 @@ export default function MissionControl() {
         {/* Tabs */}
         <div style={{ background: 'rgba(13,30,53,0.95)', border: '1px solid rgba(18,168,172,0.2)', flex: 1 }}>
           <div style={{ display: 'flex', borderBottom: '1px solid rgba(18,168,172,0.15)' }}>
-            {(['alerts','events','sites'] as const).map(t => (
+            {((['alerts','events','sites','signals'] as const)).map(t => (
               <button key={t} onClick={() => setTab(t)} style={{
                 padding: '9px 16px', background: 'none', border: 'none', cursor: 'pointer',
                 borderBottom: tab === t ? '2px solid #C8973A' : '2px solid transparent',
@@ -405,7 +415,7 @@ export default function MissionControl() {
                 fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase',
                 fontFamily: 'monospace', marginBottom: -1,
               }}>
-                {t} {t === 'alerts' ? `(${alerts.length})` : t === 'events' ? `(${events.length})` : `(${sites.length})`}
+                {t} {t === 'alerts' ? `(${alerts.length})` : t === 'events' ? `(${events.length})` : t === 'sites' ? `(${sites.length})` : `(${signals.length})`}
               </button>
             ))}
           </div>
@@ -490,6 +500,37 @@ export default function MissionControl() {
                       <div style={{ fontSize: 9, color: '#4A6080', marginTop: 2 }}>
                         {s.site_type} · {s.source}
                         {s.metadata?.flow_cfs ? ` · ${Number(s.metadata.flow_cfs).toFixed(1)} cfs` : ''}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 9, color: '#4A6080' }}>{fmtAgo(s.created_at)}</div>
+                  </div>
+                ))
+            )}
+
+            {tab === 'signals' && (
+              signals.length === 0
+                ? <div style={{ padding: 24, fontSize: 11, color: '#4A6080', textAlign: 'center' }}>
+                    No signal scans yet — run a Whisper Map field scan from LithicEarth
+                  </div>
+                : signals.map((s, i) => (
+                  <div key={s.id || i} style={{
+                    display: 'grid', gridTemplateColumns: '80px 70px 1fr auto',
+                    gap: 10, padding: '8px 14px',
+                    borderBottom: '1px solid rgba(18,168,172,0.06)',
+                    alignItems: 'start',
+                  }}>
+                    <span style={{ fontSize: 9, color: '#12A8AC', fontFamily: 'monospace', paddingTop: 1 }}>
+                      {s.signal_type?.toUpperCase()}
+                    </span>
+                    <span style={{ fontSize: 9, color: '#C8973A', fontFamily: 'monospace' }}>
+                      {s.frequency_hz ? `${(s.frequency_hz/1e6).toFixed(0)}MHz` : '—'}
+                    </span>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#F0F4F8', fontWeight: 600 }}>
+                        {s.ssid || s.notes || `${s.lat?.toFixed(4)}, ${s.lon?.toFixed(4)}`}
+                      </div>
+                      <div style={{ fontSize: 9, color: '#4A6080', marginTop: 2 }}>
+                        RSSI: {s.rssi_dbm ? `${s.rssi_dbm} dBm` : '—'} · {s.lat?.toFixed(4)}, {s.lon?.toFixed(4)}
                       </div>
                     </div>
                     <div style={{ fontSize: 9, color: '#4A6080' }}>{fmtAgo(s.created_at)}</div>

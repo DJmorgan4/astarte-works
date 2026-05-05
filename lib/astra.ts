@@ -80,3 +80,37 @@ export async function markAlertRead(id: number): Promise<void> {
   const sb = getServerClient()
   await sb.from('astra_alerts').update({ read: true }).eq('id', id)
 }
+
+export interface SignalScan {
+  id: string
+  scan_session: string
+  signal_type: string
+  lat: number
+  lon: number
+  frequency_hz: number | null
+  rssi_dbm: number | null
+  ssid: string | null
+  notes: string | null
+  created_at: string
+}
+
+export async function getSignalScans(limit = 200): Promise<SignalScan[]> {
+  const sb = getServerClient()
+  const { data, error } = await sb
+    .from('signal_scans')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) return []
+  return data || []
+}
+
+export async function getSignalSessions(): Promise<Record<string, SignalScan[]>> {
+  const scans = await getSignalScans(500)
+  const sessions: Record<string, SignalScan[]> = {}
+  for (const scan of scans) {
+    if (!sessions[scan.scan_session]) sessions[scan.scan_session] = []
+    sessions[scan.scan_session].push(scan)
+  }
+  return sessions
+}
