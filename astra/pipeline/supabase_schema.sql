@@ -92,3 +92,14 @@ create table if not exists astra_alerts (
 create index if not exists idx_events_status on astra_events(status);
 create index if not exists idx_alerts_read on astra_alerts(read);
 create index if not exists idx_alerts_created on astra_alerts(created_at desc);
+
+-- Phase I ESA critique storage
+create table if not exists esa_critiques (
+  id bigserial primary key,
+  site_address text,
+  report_excerpt text,
+  critique jsonb not null,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_critiques_created on esa_critiques(created_at desc);

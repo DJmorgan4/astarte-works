@@ -65,7 +65,7 @@ Be direct, technical, and precise. You are an intelligence system, not a chatbot
     ]
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 1024,
       system: systemPrompt,
       messages,
