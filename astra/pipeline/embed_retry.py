@@ -10,7 +10,7 @@ KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge"
 CHUNK_SIZE = 400
 
 # Only embed these domains this run
-TARGET_DOMAINS = ["climate", "remediation", "wildlife", "airquality"]
+TARGET_DOMAINS = ["landuse", "conservation", "energy", "water_quality", "toxicology"]
 
 def chunk_text(text, size=CHUNK_SIZE):
     chunks, current, current_size, section = [], [], 0, "general"
