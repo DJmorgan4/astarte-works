@@ -65,3 +65,30 @@ create table if not exists stratum_corrections (
 );
 
 select 'ASTRA schema ready' as status;
+
+-- ASTRA Events table (ingest worker writes here)
+create table if not exists astra_events (
+  id bigserial primary key,
+  source text not null,
+  event_type text not null,
+  payload jsonb not null default '{}',
+  severity text default 'low',
+  status text default 'pending',
+  created_at timestamptz default now()
+);
+
+-- ASTRA Alerts table (scorer writes here, dashboard reads)
+create table if not exists astra_alerts (
+  id bigserial primary key,
+  event_id bigint,
+  source text not null,
+  event_type text not null,
+  alert_level text not null,
+  payload jsonb not null default '{}',
+  read boolean default false,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_events_status on astra_events(status);
+create index if not exists idx_alerts_read on astra_alerts(read);
+create index if not exists idx_alerts_created on astra_alerts(created_at desc);
