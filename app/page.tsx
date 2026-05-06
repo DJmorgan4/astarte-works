@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div style={{
-      minHeight: "100%",
+      minHeight: "100vh",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
