@@ -101,7 +101,7 @@ def pull_nws_alerts():
             areas = props.get("areaDesc", "Texas")
             severity = props.get("severity", "Unknown")
             rec = {
-                "name": f"NWS Alert: {event} — {areas[:60]}",
+                "name": f"NWS Alert: {event} — {areas}",
                 "source": "nws_alerts",
                 "site_type": "weather_alert",
                 "latitude": 31.0, "longitude": -99.0,
