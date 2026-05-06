@@ -32,8 +32,8 @@ export default function Home() {
             Astarte Works
           </span>
           <nav style={{ display: "flex", gap: "14px", fontSize: "13px", color: "rgba(234,234,234,0.58)" }}>
-            <a href="/about" style={{ color: "inherit", textDecoration: "none" }}>About</a>
-            <a href="mailto:dj@theblueduckllc.com" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
+            <a href="/about.html" style={{ color: "inherit", textDecoration: "none" }}>About</a>
+            <a href="/contact.html" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
           </nav>
         </div>
 
