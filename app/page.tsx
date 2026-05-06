@@ -1,65 +1,139 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div style={{
+      minHeight: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "54px 18px",
+      background: "#0a0a0a",
+      color: "#eaeaea",
+      fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+      letterSpacing: "0.2px",
+    }}>
+      <div style={{
+        width: "min(760px, 100%)",
+        border: "1px solid rgba(234,234,234,0.12)",
+        borderRadius: "18px",
+        padding: "28px 22px",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))",
+        boxShadow: "0 12px 50px rgba(0,0,0,0.42)",
+      }}>
+
+        {/* Top bar */}
+        <div style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: "16px",
+          paddingBottom: "12px",
+          borderBottom: "1px solid rgba(234,234,234,0.12)",
+        }}>
+          <span style={{ fontSize: "14px", letterSpacing: "1.2px", textTransform: "uppercase", opacity: 0.92 }}>
+            Astarte Works
+          </span>
+          <nav style={{ display: "flex", gap: "14px", fontSize: "13px", color: "rgba(234,234,234,0.58)" }}>
+            <a href="/mission" style={{ color: "inherit", textDecoration: "none" }}>About</a>
+            <a href="/brain" style={{ color: "inherit", textDecoration: "none" }}>Brain</a>
+            <a href="mailto:contact@astarteworks.com" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
+          </nav>
+        </div>
+
+        {/* Hero */}
+        <div style={{ padding: "18px 0 8px" }}>
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <h1 style={{
+              margin: "14px 0 10px",
+              fontSize: "clamp(32px, 8vw, 44px)",
+              lineHeight: 1.02,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              position: "relative",
+              display: "inline-block",
+            }}>
+              STRATEGIC DESIGN
+            </h1>
+            <span style={{
+              position: "absolute",
+              left: "-2%",
+              right: "-2%",
+              height: "2px",
+              background: "rgba(234,234,234,0.55)",
+              top: "52%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+              display: "block",
+            }} />
+            <span style={{
+              position: "absolute",
+              left: "-2%",
+              right: "-2%",
+              height: "2px",
+              background: "rgba(234,234,234,0.35)",
+              top: "62%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+              display: "block",
+            }} />
+          </div>
+
+          <p style={{ margin: "0 0 10px", color: "rgba(234,234,234,0.58)", lineHeight: 1.55, fontSize: "18px" }}>
+            Confidential advisory for leadership teams navigating complexity, transition, and structural pressure.
+          </p>
+
+          <div style={{
+            marginTop: "12px",
+            display: "flex",
+            flexWrap: "wrap" as const,
+            alignItems: "center",
+            gap: "10px",
+            fontSize: "12px",
+            color: "rgba(234,234,234,0.58)",
+            letterSpacing: "0.4px",
+            textTransform: "uppercase",
+          }}>
+            {["Design", "Executive Advisory", "Crisis Architecture"].map((tag, i, arr) => (
+              <span key={tag} style={{ display: "contents" }}>
+                <span style={{
+                  display: "inline-block",
+                  border: "1px solid rgba(234,234,234,0.22)",
+                  padding: "6px 10px",
+                  borderRadius: "999px",
+                  fontSize: "12px",
+                  color: "rgba(234,234,234,0.58)",
+                  textTransform: "uppercase",
+                }}>{tag}</span>
+                {i < arr.length - 1 && <span style={{ opacity: 0.35 }}>•</span>}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Engagement box */}
+        <div style={{
+          marginTop: "16px",
+          padding: "14px",
+          border: "1px dashed rgba(234,234,234,0.12)",
+          borderRadius: "14px",
+          background: "rgba(255,255,255,0.02)",
+        }}>
+          <div style={{
+            fontSize: "12px",
+            color: "rgba(234,234,234,0.58)",
+            textTransform: "uppercase",
+            letterSpacing: "0.8px",
+            marginBottom: "8px",
+          }}>Engagement</div>
+          <p style={{ margin: "10px 0", color: "rgba(234,234,234,0.58)", lineHeight: 1.6 }}>
+            <s style={{ opacity: 0.55 }}>Open inquiry</s> Selective. Referral-based. Limited capacity.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+        <small style={{ display: "block", marginTop: "18px", color: "rgba(234,234,234,0.18)", fontStyle: "italic" }}>
+          Discretion by structure.
+        </small>
+
+      </div>
     </div>
   );
 }
