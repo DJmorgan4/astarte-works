@@ -20,7 +20,6 @@ export default function Home() {
         boxShadow: "0 12px 50px rgba(0,0,0,0.42)",
       }}>
 
-        {/* Top bar */}
         <div style={{
           display: "flex",
           alignItems: "baseline",
@@ -33,13 +32,11 @@ export default function Home() {
             Astarte Works
           </span>
           <nav style={{ display: "flex", gap: "14px", fontSize: "13px", color: "rgba(234,234,234,0.58)" }}>
-            <a href="/mission" style={{ color: "inherit", textDecoration: "none" }}>About</a>
-            <a href="/brain" style={{ color: "inherit", textDecoration: "none" }}>Brain</a>
-            <a href="mailto:contact@astarteworks.com" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
+            <a href="/about" style={{ color: "inherit", textDecoration: "none" }}>About</a>
+            <a href="mailto:dj@theblueduckllc.com" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
           </nav>
         </div>
 
-        {/* Hero */}
         <div style={{ padding: "18px 0 8px" }}>
           <div style={{ position: "relative", display: "inline-block" }}>
             <h1 style={{
@@ -54,26 +51,14 @@ export default function Home() {
               STRATEGIC DESIGN
             </h1>
             <span style={{
-              position: "absolute",
-              left: "-2%",
-              right: "-2%",
-              height: "2px",
-              background: "rgba(234,234,234,0.55)",
-              top: "52%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-              display: "block",
+              position: "absolute", left: "-2%", right: "-2%", height: "2px",
+              background: "rgba(234,234,234,0.55)", top: "52%", transform: "translateY(-50%)",
+              pointerEvents: "none", display: "block",
             }} />
             <span style={{
-              position: "absolute",
-              left: "-2%",
-              right: "-2%",
-              height: "2px",
-              background: "rgba(234,234,234,0.35)",
-              top: "62%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-              display: "block",
+              position: "absolute", left: "-2%", right: "-2%", height: "2px",
+              background: "rgba(234,234,234,0.35)", top: "62%", transform: "translateY(-50%)",
+              pointerEvents: "none", display: "block",
             }} />
           </div>
 
@@ -82,26 +67,16 @@ export default function Home() {
           </p>
 
           <div style={{
-            marginTop: "12px",
-            display: "flex",
-            flexWrap: "wrap" as const,
-            alignItems: "center",
-            gap: "10px",
-            fontSize: "12px",
-            color: "rgba(234,234,234,0.58)",
-            letterSpacing: "0.4px",
-            textTransform: "uppercase",
+            marginTop: "12px", display: "flex", flexWrap: "wrap" as const,
+            alignItems: "center", gap: "10px", fontSize: "12px",
+            color: "rgba(234,234,234,0.58)", letterSpacing: "0.4px", textTransform: "uppercase",
           }}>
             {["Design", "Executive Advisory", "Crisis Architecture"].map((tag, i, arr) => (
               <span key={tag} style={{ display: "contents" }}>
                 <span style={{
-                  display: "inline-block",
-                  border: "1px solid rgba(234,234,234,0.22)",
-                  padding: "6px 10px",
-                  borderRadius: "999px",
-                  fontSize: "12px",
-                  color: "rgba(234,234,234,0.58)",
-                  textTransform: "uppercase",
+                  display: "inline-block", border: "1px solid rgba(234,234,234,0.22)",
+                  padding: "6px 10px", borderRadius: "999px", fontSize: "12px",
+                  color: "rgba(234,234,234,0.58)", textTransform: "uppercase",
                 }}>{tag}</span>
                 {i < arr.length - 1 && <span style={{ opacity: 0.35 }}>•</span>}
               </span>
@@ -109,20 +84,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Engagement box */}
         <div style={{
-          marginTop: "16px",
-          padding: "14px",
+          marginTop: "16px", padding: "14px",
           border: "1px dashed rgba(234,234,234,0.12)",
-          borderRadius: "14px",
-          background: "rgba(255,255,255,0.02)",
+          borderRadius: "14px", background: "rgba(255,255,255,0.02)",
         }}>
           <div style={{
-            fontSize: "12px",
-            color: "rgba(234,234,234,0.58)",
-            textTransform: "uppercase",
-            letterSpacing: "0.8px",
-            marginBottom: "8px",
+            fontSize: "12px", color: "rgba(234,234,234,0.58)",
+            textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "8px",
           }}>Engagement</div>
           <p style={{ margin: "10px 0", color: "rgba(234,234,234,0.58)", lineHeight: 1.6 }}>
             <s style={{ opacity: 0.55 }}>Open inquiry</s> Selective. Referral-based. Limited capacity.
