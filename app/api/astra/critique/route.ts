@@ -89,7 +89,7 @@ You must return ONLY valid JSON in this exact structure — no preamble, no mark
 }`
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2048,
       system: systemPrompt,
       messages: [{

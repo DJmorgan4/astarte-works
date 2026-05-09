@@ -298,7 +298,7 @@ export default function NexusPage() {
       height: '100vh',
       background: '#040C18',
       color: '#F0F4F8',
-      fontFamily: "'Space Mono', monospace",
+      fontFamily: "var(--font-space-mono), monospace",
       overflow: 'hidden',
     }}>
 

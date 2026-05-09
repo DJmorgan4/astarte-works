@@ -241,7 +241,7 @@ export default function MissionControl() {
       height: '100vh',
       background: '#08111F',
       color: '#F0F4F8',
-      fontFamily: "'Space Mono', monospace",
+      fontFamily: "var(--font-space-mono), monospace",
       overflow: 'hidden',
     }}>
 
