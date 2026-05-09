@@ -39,9 +39,7 @@ const S = {
   dim:         '#141414',
   text:        '#C8C0B0',
   textDim:     '#444038',
-  red:         '#6B1A1A',
   redBright:   '#A03030',
-  green:       '#1A3A1A',
   greenBright: '#3A6A3A',
   mono:        "'Space Mono', 'Courier New', monospace",
 }
@@ -49,7 +47,7 @@ const S = {
 function fmtAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime()
   const m = Math.floor(diff / 60000)
-  if (m < 1)  return 'now'
+  if (m < 1) return 'now'
   if (m < 60) return `${m}m`
   if (m < 1440) return `${Math.floor(m/60)}h`
   return `${Math.floor(m/1440)}d`
@@ -97,17 +95,17 @@ function PulseCanvas() {
 }
 
 export default function MissionControl() {
-  const [alerts,   setAlerts]   = useState<Alert[]>([])
-  const [sites,    setSites]    = useState<Site[]>([])
-  const [chat,     setChat]     = useState<ChatMsg[]>([{
+  const [alerts,    setAlerts]    = useState<Alert[]>([])
+  const [sites,     setSites]     = useState<Site[]>([])
+  const [chat,      setChat]      = useState<ChatMsg[]>([{
     role: 'astra',
     content: 'ASTRA CORE online. STRATUM indexed. Monitoring USGS, EPA, NOAA, ASF, TCEQ feeds. Query anything.',
     ts: new Date().toLocaleTimeString('en-US', { hour12: false }),
   }])
-  const [input,    setInput]    = useState('')
-  const [thinking, setThinking] = useState(false)
-  const [clock,    setClock]    = useState('')
-  const [history,  setHistory]  = useState<{role:string;content:string}[]>([])
+  const [input,     setInput]     = useState('')
+  const [thinking,  setThinking]  = useState(false)
+  const [clock,     setClock]     = useState('')
+  const [history,   setHistory]   = useState<{role:string;content:string}[]>([])
   const [activeTab, setActiveTab] = useState<'alerts'|'sites'>('alerts')
   const chatRef = useRef<HTMLDivElement>(null)
 
@@ -204,7 +202,7 @@ export default function MissionControl() {
             <div style={{ fontSize: 7, color: S.amberDim, letterSpacing: '0.2em', marginTop: 1 }}>MISSION CONTROL</div>
           </div>
           <div style={{ width: 1, height: 24, background: S.border, margin: '0 6px' }}/>
-          <div style={{ display: 'flex', gap: 16, fontSize: 8, color: S.textDim, letterSpacing: '0.14em' }}>
+          <div style={{ display: 'flex', gap: 16, fontSize: 8, letterSpacing: '0.14em' }}>
             {['STRATUM', 'LOCUS', 'NEXUS'].map(s => (
               <span key={s} style={{ color: S.amberDim }}>{s}</span>
             ))}
@@ -221,8 +219,8 @@ export default function MissionControl() {
               {unread} UNREAD
             </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 8, color: '#3A6A3A', letterSpacing: '0.14em' }}>
-            <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#3A6A3A', boxShadow: '0 0 6px #3A6A3A' }}/>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 8, color: S.greenBright, letterSpacing: '0.14em' }}>
+            <div style={{ width: 4, height: 4, borderRadius: '50%', background: S.greenBright, boxShadow: `0 0 6px ${S.greenBright}` }}/>
             FEEDS LIVE
           </div>
           <div style={{ fontSize: 9, color: S.amber, letterSpacing: '0.06em' }}>{clock}</div>
@@ -234,26 +232,26 @@ export default function MissionControl() {
 
         {/* Pulse */}
         <div style={{
-          height: 52,
+          height: 56,
           border: `1px solid ${S.border}`,
           background: S.panel,
           position: 'relative',
           overflow: 'hidden',
         }}>
           <div style={{
-            position: 'absolute', top: 6, left: 10,
+            position: 'absolute', top: 6, left: 10, zIndex: 1,
             fontSize: 7, color: S.textDim, letterSpacing: '0.2em',
           }}>INGEST PULSE</div>
           <PulseCanvas />
         </div>
 
-        {/* Stat row */}
+        {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
-            { label: 'ALERTS', value: alerts.length, hot: alerts.length > 0 },
-            { label: 'HIGH', value: highAlerts.length, hot: highAlerts.length > 0 },
-            { label: 'SITES', value: sites.length, hot: false },
-            { label: 'FEEDS', value: 5, hot: false },
+            { label: 'ALERTS', value: alerts.length,      hot: alerts.length > 0 },
+            { label: 'HIGH',   value: highAlerts.length,  hot: highAlerts.length > 0 },
+            { label: 'SITES',  value: sites.length,       hot: false },
+            { label: 'FEEDS',  value: 5,                  hot: false },
           ].map(m => (
             <div key={m.label} style={{
               background: S.panel,
@@ -266,8 +264,8 @@ export default function MissionControl() {
           ))}
         </div>
 
-        {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 0, borderBottom: `1px solid ${S.border}` }}>
+        {/* Tabs */}
+        <div style={{ display: 'flex', borderBottom: `1px solid ${S.border}` }}>
           {(['alerts', 'sites'] as const).map(t => (
             <button key={t} onClick={() => setActiveTab(t)} style={{
               background: 'none', border: 'none', cursor: 'pointer',
@@ -275,9 +273,9 @@ export default function MissionControl() {
               fontSize: 8, letterSpacing: '0.2em',
               color: activeTab === t ? S.amber : S.textDim,
               borderBottom: activeTab === t ? `1px solid ${S.amber}` : '1px solid transparent',
-              marginBottom: -1,
+              marginBottom: -1, fontFamily: S.mono,
             }}>
-              {t.toUpperCase()} {t === 'alerts' ? `(${alerts.length})` : `(${sites.length})`}
+              {t.toUpperCase()} ({t === 'alerts' ? alerts.length : sites.length})
             </button>
           ))}
         </div>
@@ -292,21 +290,21 @@ export default function MissionControl() {
               <div key={a.id} style={{
                 padding: '8px 12px',
                 background: S.panel,
-                border: `1px solid ${a.alert_level === 'HIGH' ? 'rgba(160,48,48,0.3)' : S.border}`,
+                border: `1px solid ${a.alert_level === 'HIGH' ? 'rgba(160,48,48,0.25)' : S.border}`,
                 display: 'grid',
-                gridTemplateColumns: '48px 1fr 36px',
+                gridTemplateColumns: '44px 1fr 32px',
                 gap: 10,
                 alignItems: 'center',
               }}>
                 <div style={{
-                  fontSize: 7, letterSpacing: '0.12em',
+                  fontSize: 7, letterSpacing: '0.1em',
                   color: a.alert_level === 'HIGH' ? S.redBright : a.alert_level === 'MEDIUM' ? S.amber : S.textDim,
                 }}>
                   {a.alert_level}
                 </div>
                 <div>
                   <div style={{ fontSize: 10, color: S.text, marginBottom: 2 }}>{event}</div>
-                  {areas && <div style={{ fontSize: 8, color: S.textDim, letterSpacing: '0.04em' }}>{String(areas).slice(0, 80)}</div>}
+                  {areas && <div style={{ fontSize: 8, color: S.textDim }}>{String(areas).slice(0, 80)}</div>}
                 </div>
                 <div style={{ fontSize: 7, color: S.textDim, textAlign: 'right' }}>{fmtAgo(a.created_at)}</div>
               </div>
@@ -319,7 +317,7 @@ export default function MissionControl() {
               background: S.panel,
               border: `1px solid ${S.border}`,
               display: 'grid',
-              gridTemplateColumns: '1fr 60px',
+              gridTemplateColumns: '1fr 56px',
               gap: 10,
               alignItems: 'center',
             }}>
@@ -332,7 +330,7 @@ export default function MissionControl() {
           ))}
 
           {activeTab === 'alerts' && alerts.length === 0 && (
-            <div style={{ padding: 20, fontSize: 9, color: S.textDim, textAlign: 'center', letterSpacing: '0.14em' }}>
+            <div style={{ padding: 24, fontSize: 9, color: S.textDim, textAlign: 'center', letterSpacing: '0.14em' }}>
               NO ACTIVE ALERTS
             </div>
           )}
@@ -342,8 +340,8 @@ export default function MissionControl() {
         <div style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: `1px solid ${S.border}` }}>
           {[
             { label: 'CETO INTERACTIVE', href: 'https://cetointeractive.com' },
-            { label: 'LITHICEARTH', href: 'https://lithicearth.com' },
-            { label: 'BLUE DUCK FDN', href: 'https://theblueduck.org' },
+            { label: 'LITHICEARTH',      href: 'https://lithicearth.com' },
+            { label: 'BLUE DUCK FDN',    href: 'https://theblueduck.org' },
           ].map(e => (
             <a key={e.label} href={e.href} target="_blank" rel="noreferrer" style={{
               fontSize: 7, color: S.textDim, letterSpacing: '0.16em',
@@ -371,7 +369,6 @@ export default function MissionControl() {
           <div style={{ fontSize: 7, color: S.textDim, letterSpacing: '0.14em' }}>LOCUS CORE</div>
         </div>
 
-        {/* Context tags */}
         <div style={{ padding: '8px 16px', borderBottom: `1px solid ${S.border}`, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {['ASTM E1527', 'TCEQ Rules', 'USACE Wetlands', 'MSIGI v1', 'SAR Pipeline', '14 Corpora'].map(tag => (
             <div key={tag} style={{
@@ -381,11 +378,12 @@ export default function MissionControl() {
           ))}
         </div>
 
-        {/* Chat messages */}
         <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {chat.map((m, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4,
-              alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+            <div key={i} style={{
+              display: 'flex', flexDirection: 'column', gap: 4,
+              alignItems: m.role === 'user' ? 'flex-end' : 'flex-start',
+            }}>
               <div style={{ fontSize: 7, color: S.textDim, letterSpacing: '0.12em' }}>
                 {m.role === 'astra' ? 'ASTRA' : 'DJ'} · {m.ts}
               </div>
@@ -410,7 +408,6 @@ export default function MissionControl() {
           )}
         </div>
 
-        {/* Input */}
         <div style={{
           padding: '10px 16px',
           borderTop: `1px solid ${S.borderHot}`,
@@ -446,6 +443,13 @@ export default function MissionControl() {
           </button>
         </div>
       </aside>
+
+      <style>{`
+        *{box-sizing:border-box}
+        ::-webkit-scrollbar{width:2px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(176,136,64,0.25)}
+      `}</style>
     </div>
   )
 }
