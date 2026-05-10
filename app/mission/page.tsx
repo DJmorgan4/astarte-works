@@ -41,8 +41,8 @@ const S = {
   blue:      '#B08840',
   blueDark:  '#080808',
   blueLight: 'rgba(176,136,64,0.07)',
-  teal:      '#B08840',
-  tealLight: 'rgba(176,136,64,0.05)',
+  amber:     '#B08840',
+  amberLight:'rgba(176,136,64,0.05)',
   green:     '#B08840',
   red:       '#e74c3c',
   mono:      "'Space Mono','Courier New',monospace",
@@ -266,9 +266,9 @@ export default function MissionControl() {
         <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,flexShrink:0}}>
           {[
             {l:'KNOWLEDGE',  v:kCount,          c:S.blue,  sub:'astra corpus'},
-            {l:'SITES',      v:sites.length,    c:S.teal,  sub:'stratum tracked'},
+            {l:'SITES',      v:sites.length,    c:S.amber,  sub:'stratum tracked'},
             {l:'ESA',        v:esaSites.length, c:S.blue,  sub:'phase i active'},
-            {l:'GAUGES',     v:gaugeSites.length,c:S.teal, sub:'usgs live'},
+            {l:'GAUGES',     v:gaugeSites.length,c:S.amber, sub:'usgs live'},
             {l:'BIDS',       v:BIDS.length,     c:S.blue,  sub:'pipeline'},
           ].map(m=>(
             <div key={m.l} style={{background:S.panel,borderRadius:8,padding:'12px 14px',
@@ -298,7 +298,7 @@ export default function MissionControl() {
               return (
                 <div key={i} style={{padding:'10px 16px',borderBottom:i<BIDS.length-1?`1px solid ${S.border}`:'none',
                   display:'grid',gridTemplateColumns:'80px 1fr 100px 90px 80px',gap:12,alignItems:'center'}}>
-                  <div style={{fontSize:9,fontWeight:600,color:b.entity==='Ceto'?S.blue:S.teal,
+                  <div style={{fontSize:9,fontWeight:600,color:b.entity==='Ceto'?S.blue:S.amber,
                     letterSpacing:'0.08em',fontFamily:S.mono}}>{b.entity.toUpperCase()}</div>
                   <div style={{fontSize:12,color:S.ink,fontWeight:500}}>{b.name}</div>
                   <div style={{fontSize:10,color:S.inkDim,fontFamily:S.mono}}>{b.due}</div>
@@ -322,7 +322,7 @@ export default function MissionControl() {
           <div style={{padding:'10px 16px',borderBottom:`1px solid ${S.border}`,
             display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
-              <div style={{width:3,height:14,background:S.teal,borderRadius:2}}/>
+              <div style={{width:3,height:14,background:S.amber,borderRadius:2}}/>
               <span style={{fontSize:10,fontWeight:600,color:S.ink,letterSpacing:'0.1em'}}>STRATUM SITES</span>
             </div>
             <span style={{fontSize:9,color:S.inkFaint,fontFamily:S.mono}}>{sites.length} tracked · {esaSites.length} ESA</span>
@@ -331,10 +331,10 @@ export default function MissionControl() {
             {sites.map(s=>(
               <div key={s.id} style={{padding:'9px 16px',
                 borderBottom:`1px solid ${S.border}`,
-                borderLeft:`3px solid ${s.site_type==='ESA'?S.blue:S.teal}`,
+                borderLeft:`3px solid ${s.site_type==='ESA'?S.blue:S.amber}`,
                 display:'grid',gridTemplateColumns:'70px 1fr 70px 60px',gap:12,alignItems:'center'}}>
                 <div style={{fontSize:8,fontWeight:600,letterSpacing:'0.1em',fontFamily:S.mono,
-                  color:s.site_type==='ESA'?S.blue:S.teal}}>
+                  color:s.site_type==='ESA'?S.blue:S.amber}}>
                   {s.site_type==='stream_gauge'?'GAUGE':s.site_type.toUpperCase()}
                 </div>
                 <div style={{fontSize:12,color:S.ink}}>{s.name}</div>
@@ -357,8 +357,8 @@ export default function MissionControl() {
         <div style={{display:'flex',gap:8,flexShrink:0}}>
           {[
             {l:'Ceto Interactive', h:'https://cetointeractive.com/portal', c:S.blue},
-            {l:'LithicEarth Viewer', h:'https://lithicearth.com/portal/viewer', c:S.teal},
-            {l:'Blue Duck Foundation', h:'https://theblueduck.org', c:S.teal},
+            {l:'LithicEarth Viewer', h:'https://lithicearth.com/portal/viewer', c:S.amber},
+            {l:'Blue Duck Foundation', h:'https://theblueduck.org', c:S.amber},
           ].map(e=>(
             <a key={e.l} href={e.h} target="_blank" rel="noreferrer" style={{
               fontSize:11,color:e.c,fontWeight:500,textDecoration:'none',
