@@ -220,3 +220,164 @@ The Foundation cannot operate for the private benefit of DJ Morgan, The Blue Duc
 
 # VERSION LOG
 v2.0 — May 2026 — Full rebuild with substantive operational knowledge for DJ Morgan / The Blue Duck LLC entity stack
+
+---
+
+# GOVERNMENT CONTRACTING — CETO INTERACTIVE
+
+## SAM.gov Registration and Maintenance
+- CAGE Code: 14V05 (assigned, active)
+- UEI: LG15KPRZFQE3
+- SAM.gov registration must be renewed ANNUALLY — expiration = ineligible for federal contracts
+- Renewal reminder: set calendar alert 60 days before expiration date
+- Entity administrator must log in annually even if no changes
+- Check SAM.gov status before submitting any federal proposal or RFP response
+
+## NAICS Codes for Ceto Interactive
+Primary: 541620 — Environmental Consulting Services
+Secondary: 541370 — Surveying and Mapping Services (geospatial work)
+Additional: 541690 — Other Scientific and Technical Consulting
+Register all applicable NAICS codes in SAM.gov profile.
+
+## Small Business Designations Available to Ceto
+- Small Business (default for revenue under SBA size standard for 541620: $19M)
+- Woman-Owned Small Business (WOSB): requires certification if applicable
+- Service-Disabled Veteran-Owned Small Business (SDVOSB): requires certification
+- 8(a) Business Development: SBA program for disadvantaged businesses — 9-year term
+- HUBZone: If principal office in HUBZone — verify at sba.gov/hubzone-map
+McKinney, TX: Check current HUBZone designation — Collin County has some qualifying areas
+
+## Texas ESBD (Electronic State Business Daily)
+Texas state procurement portal: esbd.cpa.texas.gov
+Ceto must be registered to bid on Texas state agency contracts.
+ESBD registration separate from SAM.gov — both required for state and federal work.
+Texas Comptroller HUB certification (Historically Underutilized Business):
+  Separate Texas program — valuable for state agency procurement set-asides.
+  Application through Texas Comptroller office.
+
+## Proposal and RFP Best Practices
+- Read solicitation fully before responding — scope, evaluation criteria, deliverables
+- Technical approach: Describe CETO portal as differentiator — live TCEQ data, automated scoring
+- Past performance: Even internal or pro-bono projects count if documented
+- Price to win: Research similar contract awards on USASpending.gov and FPDS.gov
+- Subcontracting plan: Large contracts may require small business subcontracting plan
+- Teaming: Consider teaming agreement with larger prime contractor for first federal work
+
+## Contract Vehicles Worth Pursuing
+IDIQ (Indefinite Delivery/Indefinite Quantity): Award once, task orders issued over time.
+  Once on vehicle, easier to win task orders without full competition.
+  GSA Schedule 541 (Environmental): Apply after 2+ years in business with past performance.
+  SEWP, OASIS: Other government-wide vehicles — assess fit as Ceto grows.
+Texas DIR contracts: State IT/consulting vehicle — assess applicability.
+
+## Teaming and Subcontracting
+Teaming agreement: Written agreement between Ceto and prime/sub defining roles, IP, payment.
+  Must specify: Work share, payment terms, IP ownership, non-compete during performance.
+  Have attorney review before signing.
+Subcontractor to larger firm: Easiest entry point for federal work.
+  Ceto provides specialized Phase I ESA/TCEQ expertise as subcontractor.
+  Revenue flows through prime — prime takes 10-15% overhead typically.
+
+---
+
+# PHASE I ESA CONTRACTS AND LIABILITY
+
+## Scope of Work Language
+Phase I ESA contracts must clearly define:
+- Scope: ASTM E1527-21 compliant desktop + site reconnaissance + regulatory database review
+- What is NOT included: Phase II, soil sampling, laboratory analysis, STEERS manual search (unless specified)
+- Deliverable: Written report meeting ASTM E1527-21 format requirements
+- Timeline: Typically 5-10 business days for standard residential/commercial
+- Access: Client responsible for providing site access for reconnaissance
+
+## Liability and Indemnification
+Limitation of liability clause: Essential for any Phase I ESA contract.
+  Recommended: Limit liability to contract fee paid.
+  Example: "Consultant's total liability shall not exceed the fee paid for this assessment."
+  Without this: Potential liability equals property value or cleanup costs — existential risk.
+
+Indemnification: Client indemnifies consultant against third-party claims arising from
+  client's use of report beyond stated scope.
+
+Reliance clause: Report prepared for stated client only.
+  Third-party reliance requires written reliance letter (additional fee appropriate).
+  Lender reliance letter: Common request from lenders — charge $500-$1,500 per letter.
+
+Standard of care: "Services performed consistent with standard of professional care
+  exercised by practitioners of environmental consulting in Texas at the time of services."
+  Do NOT use "best efforts" or "guarantee" language.
+
+## E&O Insurance (Errors and Omissions)
+E&O insurance is ESSENTIAL before taking paying Phase I ESA clients.
+Without E&O: A missed LPST that causes client loss = personal liability to DJ Morgan.
+Typical E&O for small environmental consulting firm:
+  Coverage: $1M per claim / $2M aggregate = standard minimum
+  Premium: Approximately $3,000-$6,000/year for startup firm
+  Retroactive date: Must cover work from first paid project
+  Tail coverage: Buy tail coverage if switching carriers — covers past work
+Carriers for environmental consulting E&O:
+  Philadelphia Insurance, Beazley, Chubb Environmental, AIG — compare quotes
+General liability also needed: $1M/$2M — separate from E&O
+  GL covers bodily injury and property damage on-site during reconnaissance
+Combined GL + E&O annual premium estimate: $5,000-$10,000 for startup
+
+## Report Deliverable Requirements (ASTM E1527-21)
+Each Phase I ESA report must contain:
+- Executive summary with REC findings
+- Site description and current use
+- Records review (regulatory database search, historical records)
+- Site reconnaissance findings
+- Interviews (owner, occupant, key site manager if applicable)
+- EP qualifications statement
+- Limiting conditions and scope limitations
+- Significant data gaps with impact statements
+- Conclusions and opinion (RECs/HRECs/CRECs identified)
+- References
+Missing any required section = non-ASTM-compliant report = potential E&O claim
+
+---
+
+# ANNUAL COMPLIANCE MASTER CHECKLIST
+
+## January
+- [ ] Issue 1099-NEC to all contractors paid >$600 (due January 31)
+- [ ] Review prior year revenue vs franchise tax threshold
+- [ ] Begin Foundation 990 preparation if fiscal year ended December 31
+
+## March-April
+- [ ] Foundation 990 due May 15 (if fiscal year = calendar year)
+- [ ] Review Morgan & Mallard sales tax filing status (monthly vs quarterly)
+
+## May
+- [ ] Texas franchise tax reports due May 15 (all LLCs)
+- [ ] Foundation Form 990 due May 15
+- [ ] Check SAM.gov registration expiration date
+
+## Ongoing Monthly
+- [ ] Separate bank account reconciliation for each entity
+- [ ] Document any intercompany transactions
+- [ ] Update project log for government contracting past performance
+
+## Ongoing Quarterly
+- [ ] Foundation board meeting (quarterly recommended, annual minimum)
+- [ ] Public support test calculation update (running 5-year)
+- [ ] Texas sales tax returns (if Morgan & Mallard volume triggers quarterly)
+
+## Annually
+- [ ] SAM.gov registration renewal
+- [ ] ESBD registration renewal
+- [ ] E&O and GL insurance renewal — compare quotes
+- [ ] Operating agreements reviewed for updates
+- [ ] Conflict of interest disclosures from Foundation board members
+- [ ] Foundation bylaws review
+
+---
+
+# VERSION LOG
+v2.0 — May 2026 — Initial substantive build: entity stack, Foundation 501(c)(3), LLC operations
+v2.1 — May 10 2026 — Added:
+  Government contracting section (SAM.gov, NAICS, ESBD, HUBZone, teaming)
+  Phase I ESA contracts and liability section (limitation of liability, E&O, reliance letters)
+  E&O insurance guidance with carrier names and premium estimates
+  Annual compliance master checklist by month
+  ASTM E1527-21 report deliverable requirements for contract compliance
