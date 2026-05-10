@@ -107,6 +107,7 @@ export default function MissionControl() {
   const [sites,    setSites]    = useState<Site[]>([])
   const [engine,   setEngine]   = useState<'online'|'offline'|'checking'>('checking')
   const [kCount,   setKCount]   = useState(0)
+  const [dailyLog, setDailyLog] = useState<{date:string,domain:string,count:number}[]>([])
   const [chat,     setChat]     = useState<ChatMsg[]>([{
     role:'astra',
     content:'ASTRA CORE online. 20 domains active. USGS, EPA, NOAA, ASF, TCEQ feeds live. Query anything.',
@@ -150,6 +151,23 @@ export default function MissionControl() {
     } catch {}
   },[])
 
+  const fetchDailyLog = useCallback(async()=>{
+    try {
+      const r = await fetch(`${SB}/astra_knowledge?select=domain,created_at&order=created_at.desc&limit=200`,{headers:H})
+      const rows = await r.json()
+      const grouped: Record<string,Record<string,number>> = {}
+      for (const row of rows) {
+        const date = row.created_at?.slice(0,10) || 'unknown'
+        if (!grouped[date]) grouped[date] = {}
+        grouped[date][row.domain] = (grouped[date][row.domain]||0) + 1
+      }
+      const log = Object.entries(grouped).slice(0,7).flatMap(([date,domains])=>
+        Object.entries(domains).map(([domain,count])=>({date,domain,count}))
+      )
+      setDailyLog(log)
+    } catch {}
+  },[])
+
   const checkEngine = useCallback(async()=>{
     try {
       const r = await fetch('https://lithicearth-production.up.railway.app/health',{signal:AbortSignal.timeout(5000)})
@@ -158,11 +176,11 @@ export default function MissionControl() {
   },[])
 
   useEffect(()=>{
-    fetchSites(); fetchKCount(); checkEngine()
-    const t=setInterval(()=>{fetchSites();fetchKCount()},60000)
+    fetchSites(); fetchKCount(); checkEngine(); fetchDailyLog()
+    const t=setInterval(()=>{fetchSites();fetchKCount();fetchDailyLog()},60000)
     const e=setInterval(checkEngine,120000)
     return ()=>{clearInterval(t);clearInterval(e)}
-  },[fetchSites,fetchKCount,checkEngine])
+  },[fetchSites,fetchKCount,checkEngine,fetchDailyLog])
 
   useEffect(()=>{chatRef.current?.scrollTo({top:chatRef.current.scrollHeight,behavior:'smooth'})},[chat])
 
@@ -383,6 +401,24 @@ export default function MissionControl() {
             engine <span style={{color:engine==='online'?S.green:S.red,fontWeight:600}}>{engine}</span>
           </div>
         </div>
+
+        {dailyLog.length > 0 && (
+        <div style={{padding:'10px 18px',borderBottom:`1px solid ${S.border}`,background:S.bg,maxHeight:160,overflowY:'auto'}}>
+          <div style={{fontSize:8,color:S.inkFaint,letterSpacing:'0.12em',marginBottom:8,textTransform:'uppercase'}}>Daily Knowledge Log</div>
+          {Array.from(new Set(dailyLog.map(r=>r.date))).map(date=>(
+            <div key={date} style={{marginBottom:8}}>
+              <div style={{fontSize:8,color:S.blue,letterSpacing:'0.1em',marginBottom:4,fontFamily:'Space Mono,monospace'}}>{date}</div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+                {dailyLog.filter(r=>r.date===date).map((r,i)=>(
+                  <div key={i} style={{fontSize:8,padding:'2px 6px',border:`1px solid ${S.borderBlue}`,borderRadius:3,color:S.inkDim,background:S.blueLight,fontFamily:'Space Mono,monospace'}}>
+                    {r.domain} <span style={{color:S.blue,fontWeight:600}}>+{r.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        )}
 
         <div ref={chatRef} style={{flex:1,overflowY:'auto',padding:'16px 18px',
           display:'flex',flexDirection:'column',gap:16}}>
