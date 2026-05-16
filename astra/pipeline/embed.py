@@ -8,7 +8,7 @@ import os, json, httpx
 from pathlib import Path
 
 OLLAMA_URL = "http://localhost:11434"
-SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL", "https://jmkophesisqqmocwhto.supabase.co")
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL", "https://jmkopheshisqqmocwhto.supabase.co")
 SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "sb_publishable_oJCKKDU8IGdOPPykH9aQFg_tJLjXdO4")
 KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge"
 CHUNK_SIZE = 400  # tokens approx

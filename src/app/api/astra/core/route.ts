@@ -41,29 +41,68 @@ RESPONSE STYLE:
 - For Texas public land: always mention permit requirements and TPWD rules
 - Never fabricate regulatory database results — say "query live databases" for specific site lookups`
 
-// ── RAG retrieval from stratum_chunks (when populated) ───────────────
-async function retrieveContext(query: string): Promise<string> {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return ''
+// ── RAG retrieval from astra_knowledge ───────────────────────────────
+async function retrieveContext(query: string): Promise<{ context: string; chunks: number }> {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return { context: '', chunks: 0 }
+  
   try {
-    // When stratum_chunks has embeddings, this will do vector similarity search
-    // For now: keyword-based retrieval from domain tags
-    const keywords = query.toLowerCase().split(' ').filter(w => w.length > 4)
-    const domain = keywords.find(k => [
-      'wetland','tceq','phase','swppp','flood','soil','aquifer','sar','ndvi','lidar',
-      'hunting','wma','spring','creek','river','hiking','camping','ranch'
-    ].includes(k))
+    // Get embedding from Ollama for the query
+    // Since Ollama is local-only, fall back to keyword search in production
+    const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 4)
+    
+    const domainMap: Record<string, string> = {
+      'wetland': 'wetlands', 'hydric': 'wetlands', 'delineat': 'wetlands', 'nwi': 'wetlands',
+      'tceq': 'regulatory', 'rcra': 'regulatory', 'cercla': 'regulatory', 'superfund': 'regulatory',
+      'phase': 'regulatory', 'astm': 'regulatory', 'rec': 'regulatory',
+      'swppp': 'regulatory', 'tpdes': 'regulatory', 'stormwater': 'regulatory',
+      'flood': 'hydrology', 'aquifer': 'hydrology', 'creek': 'hydrology', 'river': 'hydrology',
+      'soil': 'soils', 'ssurgo': 'soils', 'drainage': 'soils', 'hydro': 'soils',
+      'hunting': 'texas_hunting', 'wma': 'texas_hunting', 'tpwd': 'texas_hunting', 'crane': 'texas_hunting',
+      'spring': 'water_quality', 'swimming': 'water_quality', 'water': 'water_quality',
+      'wildlife': 'wildlife', 'habitat': 'wildlife', 'bird': 'wildlife', 'waterfowl': 'wildlife',
+      'conservation': 'conservation', 'grant': 'conservation', 'easement': 'conservation',
+      'geology': 'geology', 'formation': 'geology', 'lithic': 'geology',
+      'climate': 'climate', 'weather': 'climate', 'temperature': 'climate',
+      'remediation': 'remediation', 'cleanup': 'remediation', 'contamina': 'remediation',
+      'ndvi': 'landuse', 'lidar': 'landuse', 'satellite': 'landuse', 'terrain': 'landuse',
+    }
 
-    if (!domain) return ''
+    // Find best matching domain
+    let matchedDomain: string | null = null
+    for (const keyword of keywords) {
+      for (const [pattern, domain] of Object.entries(domainMap)) {
+        if (keyword.includes(pattern) || pattern.includes(keyword)) {
+          matchedDomain = domain
+          break
+        }
+      }
+      if (matchedDomain) break
+    }
 
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stratum_chunks?domain=eq.${encodeURIComponent(domain)}&select=content,domain,chunk_index&limit=5`,
-      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
-    )
-    if (!res.ok) return ''
+    // Query astra_knowledge by domain
+    const url = matchedDomain
+      ? `${SUPABASE_URL}/rest/v1/astra_knowledge?domain=eq.${matchedDomain}&select=content,domain,section&limit=4&order=chunk_index.asc`
+      : `${SUPABASE_URL}/rest/v1/astra_knowledge?select=content,domain,section&limit=3&order=chunk_index.asc`
+
+    const res = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+    })
+
+    if (!res.ok) return { context: '', chunks: 0 }
     const chunks = await res.json()
-    if (!Array.isArray(chunks) || !chunks.length) return ''
-    return '\n\nSTRATUM CONTEXT:\n' + chunks.map((c: any) => c.content).join('\n---\n')
-  } catch { return '' }
+    if (!Array.isArray(chunks) || !chunks.length) return { context: '', chunks: 0 }
+
+    const context = `\n\n--- STRATUM KNOWLEDGE (${matchedDomain || 'general'}) ---\n` +
+      chunks.map((c: any) => `[${c.domain}/${c.section}]\n${c.content}`).join('\n---\n') +
+      '\n--- END STRATUM ---'
+
+    return { context, chunks: chunks.length }
+  } catch {
+    return { context: '', chunks: 0 }
+  }
 }
 
 // ── Store interaction for learning ───────────────────────────────────
@@ -101,13 +140,12 @@ export async function POST(req: NextRequest) {
 
     if (!query) return NextResponse.json({ error: 'Query required' }, { status: 400 })
 
-    // Retrieve STRATUM context
-    const stratumContext = await retrieveContext(query)
+    // RAG — retrieve relevant STRATUM knowledge
+    const { context, chunks } = await retrieveContext(query)
 
-    // Build system prompt
-    const system = systemOverride || (ASTRA_CORE_SYSTEM + stratumContext)
+    // Build system with injected context
+    const system = systemOverride || (ASTRA_CORE_SYSTEM + context)
 
-    // Build messages
     const messages: Anthropic.MessageParam[] = [
       ...history.filter((m: any) => m.role && m.content).slice(-10),
       { role: 'user', content: query },
@@ -126,22 +164,25 @@ export async function POST(req: NextRequest) {
       .join('\n')
       .trim()
 
-    // Classify domain from response
+    // Classify domain
     const domainMap: Record<string, string> = {
-      'phase i': 'esa', 'phase ii': 'esa', 'rec': 'esa', 'hrec': 'esa',
-      'tceq': 'regulatory', 'epa': 'regulatory', 'astm': 'regulatory',
+      'phase i': 'esa', 'phase ii': 'esa', 'rec': 'esa', 'hrec': 'esa', 'astm': 'esa',
+      'tceq': 'regulatory', 'epa': 'regulatory', 'rcra': 'regulatory', 'cercla': 'regulatory',
       'wetland': 'wetlands', 'hydric': 'wetlands', 'nwi': 'wetlands',
       'swppp': 'swppp', 'tpdes': 'swppp', 'bmp': 'swppp',
-      'wma': 'discovery', 'hiking': 'discovery', 'spring': 'discovery',
-      'ndvi': 'geospatial', 'sar': 'geospatial', 'lidar': 'geospatial',
-      'muon': 'geospatial', 'elevation': 'geospatial',
+      'wma': 'discovery', 'hiking': 'discovery', 'spring': 'discovery', 'hunting': 'discovery',
+      'ndvi': 'geospatial', 'sar': 'geospatial', 'lidar': 'geospatial', 'sentinel': 'geospatial',
+      'muon': 'geospatial', 'elevation': 'geospatial', 'terrain': 'geospatial',
+      'soil': 'soils', 'ssurgo': 'soils',
+      'flood': 'hydrology', 'aquifer': 'hydrology',
+      'conservation': 'conservation', 'grant': 'conservation',
     }
     const queryLower = query.toLowerCase()
     const domain = requestedDomain ||
       Object.entries(domainMap).find(([k]) => queryLower.includes(k))?.[1] ||
       'general'
 
-    // Store for learning (fire and forget)
+    // Log interaction (fire and forget)
     storeInteraction(query, content, domain, source)
 
     return NextResponse.json({
@@ -149,7 +190,8 @@ export async function POST(req: NextRequest) {
       domain,
       subsystem: 'ASTRA',
       engine: 'LOCUS',
-      stratum_context: stratumContext ? true : false,
+      stratum_chunks_used: chunks,
+      stratum_domain: chunks > 0 ? domain : null,
       model: 'claude-sonnet-4-20250514',
     })
   } catch (err: any) {
