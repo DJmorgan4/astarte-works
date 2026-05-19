@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     ]
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 2048,
       system,
       messages,
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
       engine: 'LOCUS',
       stratum_chunks_used: chunks,
       stratum_domain: chunks > 0 ? domain : null,
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
     })
   } catch (err: any) {
     return NextResponse.json(
