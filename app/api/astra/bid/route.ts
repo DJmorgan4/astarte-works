@@ -55,7 +55,10 @@ export async function POST(req: Request) {
       const mi = market_intel
       const recips = Array.isArray(mi.top_recipients)
         ? mi.top_recipients
-            .map((r) => r.name ? (r.total ? r.name + ' (
+            .map((r) => {
+              if (!r.name) return ''
+              if (!r.total) return r.name
+              return r.name + ' (
 
     const capability = entityKey === 'blue_duck'
       ? `The Blue Duck Foundation — a Texas 501(c)(3) conservation nonprofit (wetlands, waterfowl, land stewardship, cultural resources). Founder DJ Morgan holds an EP-TX environmental credential and a B.S. in Environmental Sciences. New nonprofit (est. Feb 2026), no prior federal grant history — strongest on private-lands habitat, wetland restoration, and Central Flyway work.`
@@ -133,7 +136,8 @@ Return your verdict as JSON only.`
     return NextResponse.json({ error: String(e) }, { status: 500 })
   }
 }
- + Number(r.total).toLocaleString() + ')' : r.name) : '')
+ + Number(r.total).toLocaleString() + ')'
+            })
             .filter(Boolean)
             .join('; ')
         : ''
