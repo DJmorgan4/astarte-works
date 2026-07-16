@@ -120,7 +120,7 @@ ${liveContext ? `\n## Live STRATUM Data:\n${liveContext}` : ''}`
     ]
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5',
       max_tokens: 1600,
       system: systemPrompt,
       messages,
