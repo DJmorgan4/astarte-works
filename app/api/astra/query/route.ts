@@ -61,13 +61,14 @@ async function getRecentContext(): Promise<string> {
   const sb = getServerClient()
   const { data, error } = await sb
     .from('stratum_sites')
-    .select('name, source, site_type, metadata')
+    .select('name, source, site_type, metadata, created_at')
     .order('created_at', { ascending: false })
     .limit(10)
   if (error || !data?.length) return ''
-  return data.map((s: { name: string; source: string; site_type: string; metadata: Record<string, unknown> }) =>
-    `${s.name} (${s.site_type}) — ${JSON.stringify(s.metadata).slice(0, 120)}`
-  ).join('\n')
+  return data.map((s: { name: string; source: string; site_type: string; metadata: Record<string, unknown>; created_at: string }) => {
+    const when = s.created_at ? new Date(s.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'undated'
+    return `[${when}] ${s.name} (${s.site_type}) — ${JSON.stringify(s.metadata).slice(0, 120)}`
+  }).join('\n')
 }
 
 export async function POST(req: Request) {
@@ -87,7 +88,22 @@ export async function POST(req: Request) {
       ? `\nDomains still in draft (scaffolded, thin content — say so if asked about them in depth): ${inventory.drafts.join(', ')}`
       : ''
 
+    const now = new Date()
+    const currentDateTime = now.toLocaleString('en-US', {
+      timeZone: 'America/Chicago',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
     const systemPrompt = `You are ASTRA CORE — the reasoning engine of Astarte Works, built by DJ Morgan / The Blue Duck LLC (EP-TX, McKinney, Texas. CAGE: 14V05 | UEI: LG15KPRZFQE3).
+
+## Current date and time (server clock, America/Chicago)
+${currentDateTime}
+This is the ONLY authoritative source for today's date. Never state or compute from any other date as "today." Dated entries in Recent STRATUM Sites below are historical records from their bracketed dates — never present them as current events.
 
 ## Knowledge (STRATUM — live inventory, ${inventory.domains.length} domains)
 ${inventory.domains.join(', ')}${draftNote}
