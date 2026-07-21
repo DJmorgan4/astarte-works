@@ -128,15 +128,20 @@ ${liveContext ? `\n## Recent STRATUM Sites\n${liveContext}` : ''}`
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1600,
+      max_tokens: 4096,
       system: systemPrompt,
       messages,
     })
 
-    const text = response.content
+    let text = response.content
       .filter((b): b is Anthropic.TextBlock => b.type === 'text')
       .map(b => b.text)
       .join('')
+
+    if (response.stop_reason === 'max_tokens') {
+      text +=
+        '\n\n---\n*Response reached the output limit and was truncated. Ask me to continue for the remainder.*'
+    }
 
     return NextResponse.json({ response: text })
   } catch (e) {
