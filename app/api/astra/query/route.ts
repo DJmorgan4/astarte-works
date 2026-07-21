@@ -4,69 +4,57 @@ import { getServerClient } from '@/lib/supabase'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const DOMAIN_KEYWORDS: Record<string, string[]> = {
-  gematria:            ['gematria','hebrew','greek','chaldean','pythagorean','isopsephy','number','letters','value','kabbalah','sefirot','tetragrammaton','yhvh','numerical'],
-  astrology:           ['astrology','astral','planet','saturn','jupiter','mars','venus','mercury','moon','sun','zodiac','chart','natal','transit','aspect','conjunction','house','sign','aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'],
-  archaeology:         ['archaeology','excavation','artifact','site','burial','stratigraphy','ancient','prehistoric','lithic','ceramic'],
-  plasma:              ['plasma','electromagnetic','bloch','zpe','zpf','evo','flyback','zvs','resonance','field','bismuth','levitation'],
-  texas_hunting:       ['hunting','duck','waterfowl','deer','hog','pheasant','flyway','blind','bag limit','tpwd','season'],
-  business_compliance: ['compliance','contract','proposal','bid','naics','cage','uei','sam.gov','rfp','rfq'],
-  conservation:        ['conservation','wetland','easement','nawca','acep','waterfowl','habitat'],
-  regulatory:          ['tceq','epa','usace','nepa','section 404','section 106','phase i','esa','astm'],
-}
+// ── Live domain inventory (cached 10 min; never hardcode the list again) ──
+let domainCache: { domains: string[]; drafts: string[]; at: number } | null = null
 
-function detectDomains(query: string): string[] {
-  const q = query.toLowerCase()
-  const matched: string[] = []
-  for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
-    if (keywords.some(kw => q.includes(kw))) matched.push(domain)
+async function getDomainInventory(): Promise<{ domains: string[]; drafts: string[] }> {
+  if (domainCache && Date.now() - domainCache.at < 600_000) return domainCache
+  const sb = getServerClient()
+  const { data } = await sb
+    .from('astra_knowledge')
+    .select('domain, metadata')
+    .not('domain', 'in', '(knowledge,lithicearth_scans)')
+  const all = new Map<string, boolean>() // domain -> hasDraftOnly
+  for (const row of data ?? []) {
+    const conf = (row.metadata as Record<string, string> | null)?.confidence ?? 'unknown'
+    const isDraft = conf === 'draft'
+    if (!all.has(row.domain)) all.set(row.domain, isDraft)
+    else if (!isDraft) all.set(row.domain, false)
   }
-  return matched
+  const domains = Array.from(all.keys()).sort()
+  const drafts = domains.filter(d => all.get(d))
+  domainCache = { domains, drafts, at: Date.now() }
+  return domainCache
 }
 
+// ── Retrieval: ranked full-text across the whole corpus ──────────────
 async function searchAstraKnowledge(query: string): Promise<string> {
   const sb = getServerClient()
-  const detectedDomains = detectDomains(query)
-
   const cleaned = query.toLowerCase().replace(/[^\w\s]/g, '')
   const terms = cleaned.split(/\s+/).filter(w => w.length > 2).slice(0, 12).join(' | ')
+  if (!terms) return ''
 
-  const chunks: Array<{domain: string; section: string; content: string}> = []
+  const { data } = await sb
+    .from('astra_knowledge')
+    .select('domain, section, content')
+    .textSearch('content', terms, { config: 'english' })
+    .not('domain', 'in', '(knowledge,lithicearth_scans)')
+    .limit(14)
 
-  // If we detected specific domains, pull directly from them
-  if (detectedDomains.length > 0) {
-    for (const domain of detectedDomains) {
-      const { data } = await sb
-        .from('astra_knowledge')
-        .select('domain, section, content')
-        .eq('domain', domain)
-        .limit(6)
-      if (data) chunks.push(...data)
-    }
-  }
+  if (!data?.length) return ''
 
-  // Also do full-text search if we have terms
-  if (terms) {
-    const { data } = await sb
-      .from('astra_knowledge')
-      .select('domain, section, content')
-      .textSearch('content', terms, { config: 'english' })
-      .limit(20)
-    if (data) chunks.push(...data)
-  }
-
-  // Deduplicate by section
+  // Dedupe by domain/section, keep order (Postgres FTS returns by relevance)
   const seen = new Set<string>()
-  const deduped = chunks.filter(r => {
+  const deduped = data.filter(r => {
     const key = `${r.domain}/${r.section}`
     if (seen.has(key)) return false
     seen.add(key)
     return true
   })
 
-  if (!deduped.length) return ''
-
-  return deduped.map(r => `[${r.domain}/${r.section}]\n${r.content}`).join('\n\n---\n\n')
+  return deduped
+    .map(r => `[${r.domain}/${r.section}]\n${r.content}`)
+    .join('\n\n---\n\n')
 }
 
 async function getRecentContext(): Promise<string> {
@@ -76,8 +64,7 @@ async function getRecentContext(): Promise<string> {
     .select('name, source, site_type, metadata')
     .order('created_at', { ascending: false })
     .limit(10)
-  if (error) return ''
-  if (!data?.length) return ''
+  if (error || !data?.length) return ''
   return data.map((s: { name: string; source: string; site_type: string; metadata: Record<string, unknown> }) =>
     `${s.name} (${s.site_type}) — ${JSON.stringify(s.metadata).slice(0, 120)}`
   ).join('\n')
@@ -90,29 +77,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing message' }, { status: 400 })
     }
 
-    const [astraContext, liveContext] = await Promise.all([
+    const [astraContext, liveContext, inventory] = await Promise.all([
       searchAstraKnowledge(message),
       getRecentContext(),
+      getDomainInventory(),
     ])
 
-    const systemPrompt = `You are ASTRA CORE — the unified AI reasoning engine powering Astarte Works, built by DJ Morgan / The Blue Duck LLC.
+    const draftNote = inventory.drafts.length
+      ? `\nDomains still in draft (scaffolded, thin content — say so if asked about them in depth): ${inventory.drafts.join(', ')}`
+      : ''
 
-You have access to 20 embedded knowledge domains. Answer questions from ANY of them with equal authority.
+    const systemPrompt = `You are ASTRA CORE — the reasoning engine of Astarte Works, built by DJ Morgan / The Blue Duck LLC (EP-TX, McKinney, Texas. CAGE: 14V05 | UEI: LG15KPRZFQE3).
 
-## Domains
-- airquality, archaeology, astrology, business_compliance, climate, conservation, energy, gematria, geology, hydrology, landuse, plasma, regulatory, remediation, soils, texas_hunting, toxicology, water_quality, wetlands, wildlife
+## Knowledge (STRATUM — live inventory, ${inventory.domains.length} domains)
+${inventory.domains.join(', ')}${draftNote}
 
-## Rules
-- Never refuse or deflect questions about gematria, astrology, numerology, Kabbalah, plasma, hunting, lineage, or business because they seem off-topic. They are all on-topic.
-- When a domain is detected, use it fully.
-- When domains overlap, synthesize across them.
-- Use retrieved ASTRA knowledge when provided below.
-- Be direct, technical, and precise. You are an intelligence system.
-- DJ traces lineages through Graham, Somerville, Dunbar, Sinclair, Kincaid. Apply this context to esoteric and genealogical queries.
-- CAGE: 14V05 | UEI: LG15KPRZFQE3 | EP-TX | McKinney, TX
+## How you reason
+- Ground answers in retrieved STRATUM knowledge when provided below. Cite the domain/section you drew from.
+- Calibrate confidence: distinguish what the corpus establishes, what is professional judgment, and what is unknown. State which.
+- Never fabricate database results, site records, or regulatory statuses. For specific site lookups, say that live databases must be queried.
+- Flag when field verification or a licensed professional (PE, geotechnical, legal counsel) is required — screening and interpretation are in scope; sealed design and legal advice are not.
+- Synthesize across domains when a question spans them; name the domains you're bridging.
+- All domains are legitimate subjects — environmental, esoteric (gematria, astrology, Kabbalah), plasma physics, hunting, lineage, business. Treat each with the same care and the same honesty about evidence quality. Esoteric analysis is interpretive within its tradition; present it as such, not as empirical claim.
+- DJ traces lineage through Graham, Somerville, Dunbar, Sinclair, Kincaid — apply as context for genealogical and esoteric queries.
+- Be direct, technical, precise. Authority comes from calibration, not volume.
 
-${astraContext ? `\n## Retrieved ASTRA Knowledge:\n${astraContext}` : ''}
-${liveContext ? `\n## Live STRATUM Data:\n${liveContext}` : ''}`
+${astraContext ? `\n## Retrieved STRATUM Knowledge\n${astraContext}` : '\n## Retrieved STRATUM Knowledge\n(none matched — answer from general reasoning and say so)'}
+${liveContext ? `\n## Recent STRATUM Sites\n${liveContext}` : ''}`
 
     const messages = [
       ...history.slice(-8),
@@ -120,7 +111,7 @@ ${liveContext ? `\n## Live STRATUM Data:\n${liveContext}` : ''}`
     ]
 
     const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1600,
       system: systemPrompt,
       messages,
