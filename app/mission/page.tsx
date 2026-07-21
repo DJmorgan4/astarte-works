@@ -9,6 +9,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface ChatMessage {
   role: 'user' | 'astra'
@@ -29,11 +31,9 @@ type ReferencePanel =
   | 'recent'
   | null
 
-const SUPABASE_URL =
-  'https://jmkopheshisqqmocwhto.supabase.co/rest/v1'
+const SUPABASE_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1`
 
-const SUPABASE_KEY =
-  'sb_publishable_oJCKKDU8IGdOPPykH9aQFg_tJLjXdO4'
+const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
 
 const SUPABASE_HEADERS = {
   apikey: SUPABASE_KEY,
@@ -693,8 +693,18 @@ export default function AstraResearch() {
                   <time>{message.timestamp}</time>
                 </div>
 
-                <div className="message-body">
-                  {message.content}
+                <div
+                  className={`message-body${
+                    message.role === 'astra' ? ' markdown' : ''
+                  }`}
+                >
+                  {message.role === 'astra' ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
+                    message.content
+                  )}
                 </div>
               </article>
             ))}
@@ -1181,6 +1191,121 @@ export default function AstraResearch() {
         .message-user .message-body {
           color: #aebdd0;
           font-size: 15px;
+        }
+
+        .message-body.markdown {
+          white-space: normal;
+        }
+
+        .message-body.markdown :global(p) {
+          margin: 0 0 14px;
+        }
+
+        .message-body.markdown :global(p:last-child) {
+          margin-bottom: 0;
+        }
+
+        .message-body.markdown :global(h1),
+        .message-body.markdown :global(h2),
+        .message-body.markdown :global(h3) {
+          margin: 22px 0 10px;
+          font-family: var(--serif);
+          font-weight: 400;
+          letter-spacing: -0.01em;
+          color: var(--text);
+        }
+
+        .message-body.markdown :global(h1) {
+          font-size: 21px;
+        }
+
+        .message-body.markdown :global(h2) {
+          font-size: 17px;
+        }
+
+        .message-body.markdown :global(h3) {
+          font-size: 14px;
+          font-family: var(--mono);
+          font-size: 10px;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          color: var(--accent);
+        }
+
+        .message-body.markdown :global(ul),
+        .message-body.markdown :global(ol) {
+          margin: 0 0 14px;
+          padding-left: 19px;
+        }
+
+        .message-body.markdown :global(li) {
+          margin-bottom: 5px;
+        }
+
+        .message-body.markdown :global(strong) {
+          color: var(--text);
+          font-weight: 600;
+        }
+
+        .message-body.markdown :global(code) {
+          padding: 1px 5px;
+          border-radius: 3px;
+          background: rgba(145, 191, 255, 0.07);
+          color: var(--accent-soft);
+          font-family: var(--mono);
+          font-size: 11px;
+        }
+
+        .message-body.markdown :global(pre) {
+          margin: 0 0 14px;
+          padding: 14px;
+          overflow-x: auto;
+          border: 1px solid var(--line);
+          border-radius: 6px;
+          background: rgba(7, 16, 28, 0.7);
+        }
+
+        .message-body.markdown :global(pre code) {
+          padding: 0;
+          background: transparent;
+        }
+
+        .message-body.markdown :global(table) {
+          width: 100%;
+          margin: 0 0 16px;
+          border-collapse: collapse;
+          font-size: 12px;
+        }
+
+        .message-body.markdown :global(th) {
+          padding: 8px 11px;
+          border-bottom: 1px solid var(--line-strong);
+          color: var(--accent);
+          font-family: var(--mono);
+          font-size: 8px;
+          font-weight: 400;
+          letter-spacing: 0.09em;
+          text-align: left;
+          text-transform: uppercase;
+        }
+
+        .message-body.markdown :global(td) {
+          padding: 8px 11px;
+          border-bottom: 1px solid var(--line);
+          color: #c6d3e3;
+        }
+
+        .message-body.markdown :global(blockquote) {
+          margin: 0 0 14px;
+          padding-left: 13px;
+          border-left: 1px solid var(--line-strong);
+          color: var(--muted);
+        }
+
+        .message-body.markdown :global(hr) {
+          margin: 18px 0;
+          border: 0;
+          border-top: 1px solid var(--line);
         }
 
         .thinking {
